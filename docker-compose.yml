@@ -1,0 +1,26 @@
+version: '3'
+services:
+  mysqldb:
+    image:  mysql:8
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=michael
+      - MYSQL_DATABASE=testdb
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./data:/var/lib/mysql
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysqldb
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_HOST}
+    volumes:
+      - .env:/usr/src/app/.env
