@@ -1,17 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../db/mysql_db";
 
-// Define the "activity" table
-// interface ActivityAttributes {
-//     contract_address: string;
-//     token_index: number;
-//     listing_price: number;
-//     maker: string;
-//     listing_from: Date;
-//     listing_to: Date;
-//     event_timestamp: Date;
-//   }
-
 
 class Activity extends Model {
     public id!: number;
