@@ -1,7 +1,6 @@
 import { Op } from 'sequelize';
 import Activity from "../models/activity.model";
 import Token from "../models/token.model";
-import sequelize from "../db/mysql_db";
 
 async function processListings() {
     try {
@@ -17,32 +16,30 @@ async function processListings() {
                   activity.token_index === token.index
               );
 
-              if (tokenActivities.length === 0) {
-                // No active listings for this token
-                token.current_price = null;
-              } else {
-                const lowestListing = tokenActivities.reduce<Activity | null>(
-                    (lowest: Activity | null, activity: Activity) => {
-                    if (!lowest || activity.listing_price < lowest.listing_price) {
-                      return activity;
-                    }
-                    return lowest;
-                  },
-                  null
-                );
-        
-                if (lowestListing) {
-                  token.current_price = lowestListing.listing_price;
+              if (tokenActivities.length !== 0) {
+                for (let tokenActivity of tokenActivities ) {
+                  await createToken(tokenActivity);
                 }
               }
-        
-              await token.save();
         }
 
         console.log('Listings processed successfully');
     } catch (error) {
         console.error('Error processing listings:', error);
     }
+}
+
+const createToken =async (data:any) => {
+  Token.create({
+    index: data.token_index,
+    contract_address:data.contract_address
+  })
+    .then((res) => {
+    console.log(`Token with id: ${res.id}, created successfully`)
+  })
+  .catch((error) => {
+    console.error(`Error creating token: ${error}`)
+  })
 }
 
 export { processListings };
