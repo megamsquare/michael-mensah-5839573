@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import Activity from "../models/activity.model";
 import Token from "../models/token.model";
+import sequelize from '../db/mysql_db';
 
 async function processListings() {
   try {
@@ -27,6 +28,10 @@ async function processListings() {
     } else {
       await createToken(activities);
     }
+
+    // Updating current price of expired date to null
+    await updateToken();
+
     console.log('Listings processed successfully');
   } catch (error) {
     console.error('Error processing listings:', error);
@@ -36,7 +41,8 @@ async function processListings() {
 const createToken = async (data: any) => {
   Token.create({
     index: data.token_index,
-    contract_address: data.contract_address
+    contract_address: data.contract_address,
+    current_price: data.listing_price
   })
     .then((res) => {
       console.log(`Token with id: ${res.id}, created successfully`)
@@ -44,6 +50,23 @@ const createToken = async (data: any) => {
     .catch((error) => {
       console.error(`Error creating token: ${error}`)
     })
+}
+
+const updateToken = async () => {
+  Token.update(
+    { contract_address: null },
+    {
+      where: {
+        index: {
+          [Op.notIn]: sequelize.literal(`
+            SELECT token_index
+            FROM activity
+            WHERE listing_to > NOW()
+          `),
+        }
+      }
+    }
+  );
 }
 
 export { processListings };

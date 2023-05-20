@@ -23,8 +23,7 @@ Token.init(
             autoIncrement: true,
         },
         index: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
+            type: DataTypes.INTEGER
         },
         contract_address: {
             type: DataTypes.STRING,
@@ -44,3 +43,4 @@ Token.init(
 );
 
 export default Token;
+
