@@ -26,7 +26,11 @@ async function processListings() {
       }
 
     } else {
-      await createToken(activities);
+      if (activities.length !== 0) {
+        for (let activity of activities) {
+          await createToken(activity);
+        }
+      }
     }
 
     // Updating current price of expired date to null
